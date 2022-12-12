@@ -1,7 +1,5 @@
 <?php
 
-define('ENVIRONMENT', 'DEVELOPMENT');
-
 /**
  * Connects with the database and has a built-in query builder.
  * You may build the query via class methods or pass in a query through the query() method.
@@ -19,9 +17,9 @@ class Database
      * Requires an array containing [$host, $dbname, $user, $password]
      * to connect with the configured database on the file (dbconfig.php).
      */
-    public function __construct()
+    public function __construct(array $dbconfig)
     {
-        [$host, $dbname, $user, $password] = require ('dbconfig.php');
+        [$host, $dbname, $user, $password] = $dbconfig;
 
         $dsn = "mysql:host=$host;dbname=$dbname";
 
@@ -176,7 +174,3 @@ class Database
     }
 
 }
-
-
-//example
-var_dump((new Database)->select('users')->getAll());
