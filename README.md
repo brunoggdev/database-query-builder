@@ -1,5 +1,6 @@
 # database-query-builder
 
-A simple yet quite powerful and interesting Database and Quebry Builder class made from absolute scratch.
+Made from absolute scratch, this is a simple yet quite poweful and totally independent
+class to connect and build queries to a database through its methods.
 
-TODO: add DI container
+You can simply download and import this file or get it through composer (todo).

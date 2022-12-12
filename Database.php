@@ -2,8 +2,8 @@
 
 /**
  * Connects with the database and has a built-in query builder.
- * You may build the query via class methods or pass in a query through the query() method.
- * @example Database $db->select('users')->getFirst();
+ * You may build the query chaining methods or pass in the query string through the query() method.
+ * @link https://github.com/brunoggdev/database-query-builder
  */
 class Database
 {
@@ -14,8 +14,8 @@ class Database
     protected PDOStatement $queryInfo;
 
     /**
-     * Requires an array containing [$host, $dbname, $user, $password]
-     * to connect with the configured database on the file (dbconfig.php).
+     * Simply requires an array containing [$host, $dbname, $user, $password]
+     * to connect to the database.
      */
     public function __construct(array $dbconfig)
     {
@@ -173,4 +173,28 @@ class Database
         return $query;
     }
 
+    /**
+    * Returns the string of the final executed query
+    */
+    public function getExecutedQuery():string
+    {
+        return $this->query;
+    }
+
+    /**
+    * Returns any errors that occoured with the execution of the query
+    */
+    public function getErrorInfo():array
+    {
+        return $this->queryInfo->errorInfo();
+    }
+
+    # COMMENTED UNTIL FURTHER VERIFICATION OF UTILITY/NECESSITY
+    /**
+    * Returns the raw PDOStatement after the execution of the query
+    */
+    // public function getPDOStatement():PDOStatement
+    // {
+    //     return $this->queryInfo;
+    // }
 }
