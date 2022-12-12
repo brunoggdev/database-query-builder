@@ -7,5 +7,5 @@ You can simply download and import this file or get it through composer (todo).
 
 # TODO
 
-> Add usage examples
-> Configure to get through composer
+* Add usage examples
+* Maybe configure to get through composer
