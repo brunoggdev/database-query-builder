@@ -3,7 +3,7 @@
 /**
  * Connects with the database and has a built-in query builder.
  * You may build the query chaining methods or pass in the query string through the query() method.
- * @example Database $db->select('users')->getFirst();
+ * @link https://github.com/brunoggdev/database-query-builder
  */
 class Database
 {
@@ -14,8 +14,8 @@ class Database
     protected PDOStatement $queryInfo;
 
     /**
-     * Requires an array containing [$host, $dbname, $user, $password]
-     * to connect with the configured database on the file (dbconfig.php).
+     * Simply requires an array containing [$host, $dbname, $user, $password]
+     * to connect to the database.
      */
     public function __construct(array $dbconfig)
     {
