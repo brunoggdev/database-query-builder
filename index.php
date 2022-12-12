@@ -3,8 +3,8 @@
 define('ENVIRONMENT', 'DEVELOPMENT');
 
 /**
- * Connects with the database and has a built-in query builder
- * (Make sure to call getFirst() or getAll() at the end of the query).
+ * Connects with the database and has a built-in query builder.
+ * You may build the query via class methods or pass in a query through the query() method.
  * @example Database $db->select('users')->getFirst();
  */
 class Database
@@ -12,8 +12,8 @@ class Database
 
     protected PDO $connection;
     protected string $query = '';
-    protected $selectParams = [];
-    protected PDOStatement $data;
+    protected $params = [];
+    protected PDOStatement $queryInfo;
 
     /**
      * Requires an array containing [$host, $dbname, $user, $password]
@@ -21,7 +21,7 @@ class Database
      */
     public function __construct()
     {
-        [$host, $dbname, $user, $password] = require('dbconfig.php');
+        [$host, $dbname, $user, $password] = require ('dbconfig.php');
 
         $dsn = "mysql:host=$host;dbname=$dbname";
 
@@ -58,22 +58,22 @@ class Database
     {
         
         foreach ($params as $key => $value) {
-
+            
             if (strpos($this->query, 'WHERE') === false) {
-                $this->query .= 'WHERE ';
+                $this->query .= ' WHERE ';
             }
             
 
             if(!preg_match('/[<>=]/', $value)){
                  
-                $this->selectParams[$key] = $value;
+                $this->params[$key] = $value;
                 $this->query .= "$key = :$key ";
                 
             }else{
                 
                 $pieces = explode(' ', $value);
                 $operators = $pieces[0];
-                $this->selectParams[$key] = $pieces[1];
+                $this->params[$key] = $pieces[1];
                 
                 $this->query .= "$key $operators :$key ";
                 
@@ -91,9 +91,8 @@ class Database
 
     /**
     * Add the INSERT clause to the query
-    * @return bool|array true for succes and false or errorInfo for failures if $returnErrorInfo = true
     */
-    public function insert(string $table, array $params = [], $returnErrorInfo = false)
+    public function insert(string $table, array $params):bool
     {
 
         $columns = implode(', ', array_keys($params));
@@ -101,18 +100,14 @@ class Database
 
         $sql = "INSERT INTO $table ($columns) VALUES($values)";
 
-        $query = $this->query($sql, $params);
+        $query = $this->executeQuery($sql, $params);
         
+
         if($query->rowCount() > 0){
             return true;
-        }else{
-
-            if($returnErrorInfo){
-                return $query->errorInfo();
-            }
-            
-            return false;
         }
+        
+        return false;
 
     }
 
@@ -135,13 +130,13 @@ class Database
     *
     * Make sure to match the array keys with the wildcards in the sql
     */
-    public function query(string $sql, array $params = []):PDOStatement
+    public function query(string $sql, array $params = [])
     {
-        $query = $this->connection->prepare($sql);
+       
+        $this->query = $sql;
+        $this->params = $params;
 
-        $query->execute($params);
-        
-        return $query;
+        return $this;
     }
 
 
@@ -150,8 +145,8 @@ class Database
     */
     public function getFirst($fetchMode = PDO::FETCH_ASSOC)
     {
-        $query = $this->query($this->query, $this->selectParams);
-
+        $query = $this->executeQuery($this->query, $this->params);
+        
         return $query->fetch($fetchMode);
     }
 
@@ -161,8 +156,27 @@ class Database
     */
     public function getAll($fetchMode = PDO::FETCH_ASSOC)
     {
-        $query = $this->query($this->query, $this->selectParams);
+        $query = $this->executeQuery($this->query, $this->params);
 
         return $query->fetchAll($fetchMode);
     }
+
+    /**
+    * Executes the query into the database and returns the PDOStatement
+    */
+    protected function executeQuery(string $sql, array $params = []):PDOStatement
+    {
+        $query = $this->connection->prepare($sql);
+
+        $query->execute($params);
+
+        $this->queryInfo = $query;
+
+        return $query;
+    }
+
 }
+
+
+//example
+var_dump((new Database)->select('users')->getAll());
